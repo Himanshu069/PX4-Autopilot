@@ -205,13 +205,22 @@ int VL53L1X::collect()
 	perf_begin(_sample_perf);
 
 
-	const int8_t quality = VL53L1X_GetRangeStatus(&rangeStatus);
+	ret = VL53L1X_GetRangeStatus(&rangeStatus);
 
 	if ((ret != PX4_OK) | (rangeStatus == VL53L1X_RANGE_STATUS_OUT_OF_BOUNDS)) {
 		perf_count(_comms_errors);
 		perf_end(_sample_perf);
 		return PX4_ERROR;
 	}
+	
+	int8_t quality = 0;
+        if (rangeStatus == VL53L1X_RANGE_STATUS_OK) {
+                quality = 100; // Perfect reading
+        } else if (rangeStatus == 1 || rangeStatus == 2) { 
+                quality = 0;  // Sigma (noise) or Signal fail
+        } else {
+                quality = 0;   // Phase fail, Min range, HW fail
+        }
 
 	const hrt_abstime timestamp_sample = hrt_absolute_time();
 
