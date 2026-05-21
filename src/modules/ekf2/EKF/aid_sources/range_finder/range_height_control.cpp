@@ -161,7 +161,7 @@ void Ekf::controlRangeHaglFusion(const imuSample &imu_sample)
 					_control_status.flags.rng_hgt = true;
 					stopRngTerrFusion();
 
-					if (!_control_status.flags.opt_flow_terrain && aid_src.innovation_rejected) {
+					if (!_control_status.flags.opt_flow_terrain && aid_src.innovation_rejected && (getHagl() < _params.ekf2_rng_a_hmax)) {
 						resetTerrainToRng(aid_src);
 						resetAidSourceStatusZeroInnovation(aid_src);
 					}
@@ -187,7 +187,7 @@ void Ekf::controlRangeHaglFusion(const imuSample &imu_sample)
 					ECL_INFO("starting %s height fusion", HGT_SRC_NAME);
 					_control_status.flags.rng_hgt = true;
 
-					if (!_control_status.flags.opt_flow_terrain && aid_src.innovation_rejected) {
+					if (!_control_status.flags.opt_flow_terrain && aid_src.innovation_rejected && (getHagl() < _params.ekf2_rng_a_hmax)) {
 						ECL_INFO("starting %s height fusion, resetting terrain", HGT_SRC_NAME);
 						resetTerrainToRng(aid_src);
 						resetAidSourceStatusZeroInnovation(aid_src);
@@ -240,7 +240,7 @@ void Ekf::controlRangeHaglFusion(const imuSample &imu_sample)
 						stopRngHgtFusion();
 						stopRngTerrFusion();
 
-					} else if (starting_conditions_passing) {
+					} else if (starting_conditions_passing && (getHagl() < _params.ekf2_rng_a_hmax)) {
 						resetTerrainToRng(aid_src);
 						resetAidSourceStatusZeroInnovation(aid_src);
 					}
@@ -261,7 +261,7 @@ void Ekf::controlRangeHaglFusion(const imuSample &imu_sample)
 					}
 
 				} else {
-					if (aid_src.innovation_rejected) {
+					if (aid_src.innovation_rejected && (getHagl() < _params.ekf2_rng_a_hmax)) {
 						resetTerrainToRng(aid_src);
 						resetAidSourceStatusZeroInnovation(aid_src);
 					}
